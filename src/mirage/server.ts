@@ -37,8 +37,9 @@ export function makeServer() {
     seeds(server) {
       server.db.loadData({
         users: [
+          { id: 'manager0', name: 'Andy Manager', username: 'andy', password: '123456', role: 'manager' },
           { id: 'manager1', name: 'Alice Manager', username: 'mgr_alice', password: 'password', role: 'manager' },
-          { id: 'manager2', name: 'Bob Manager',   username: 'mgr_bob',   password: 'password', role: 'manager' }
+          { id: 'manager2', name: 'Bob Manager',   username: 'mgr_bob',   password: 'password', role: 'manager' },
         ],
         tickets: server.schema.db.tickets, // keep factories for tickets
       });
