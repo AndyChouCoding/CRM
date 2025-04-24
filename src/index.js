@@ -7,9 +7,11 @@ import Router from "./routers/router.tsx";
 import { makeServer } from "./mirage/server";
 import AuthProvider from "./contexts/AuthContext";
 
-if (process.env.NODE_ENV === "development") {
-  makeServer();
-}
+// if (process.env.NODE_ENV === "development") {
+//   makeServer();
+// }
+
+makeServer();
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
