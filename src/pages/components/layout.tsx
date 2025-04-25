@@ -51,7 +51,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           {user && (
             <div className="flex items-center space-x-4">
               <span>已登入時長: {elapsedTime}</span>
-              <button onClick={handleLogout} className="underline">
+              <button onClick={handleLogout} className="">
                 Logout
               </button>
             </div>

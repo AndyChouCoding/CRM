@@ -25,6 +25,10 @@ const Login = () => {
           className="max-w-sm mx-auto mt-20 p-6 bg-white rounded-md shadow-md"
         >
           <h2 className="text-2xl mb-4">登入 CRM 系統</h2>
+          <div>
+            <p>可使用Manager,Agent模式登入</p>
+            <p>username:manager,agent;password:123456</p>
+          </div>
           <input
             type="text"
             className="w-full mb-3 p-2 border"

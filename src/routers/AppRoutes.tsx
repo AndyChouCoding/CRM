@@ -18,7 +18,14 @@ export const AppRoutes: React.FC = () => (
           </ProtectedRoute>
         }
       />
-      {/* 其他路由 */}
+      <Route
+        path="/ticket_center"
+        element={
+          <ProtectedRoute allowedRoles={[ 'agent', 'manager' ]}>
+            <Dashboard />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   </AuthProvider>
 );

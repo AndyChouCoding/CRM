@@ -7,6 +7,7 @@ import Router from "./routers/router.tsx";
 import { makeServer } from "./mirage/server";
 import AuthProvider from "./contexts/AuthContext";
 
+// 只在開發模式啟用
 // if (process.env.NODE_ENV === "development") {
 //   makeServer();
 // }
