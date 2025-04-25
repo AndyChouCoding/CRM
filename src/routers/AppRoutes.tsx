@@ -19,7 +19,7 @@ export const AppRoutes: React.FC = () => (
         }
       />
       <Route
-        path="/ticket_center"
+        path="/message_center"
         element={
           <ProtectedRoute allowedRoles={[ 'agent', 'manager' ]}>
             <Dashboard />

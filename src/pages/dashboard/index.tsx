@@ -5,7 +5,7 @@ const Dashboard: React.FC = () => {
   const { user } = useAuth();
   const navigation = useNavigate();
   const handle =() =>{
-    navigation('/ticket_center')
+    navigation('/message_center')
   }
 
   return (

@@ -4,7 +4,7 @@ import Layout from "../pages/components/layout";
 import Dashboard from "../pages/dashboard";
 import Login from "../pages/Login"
 import { ProtectedRoute } from '../pages/components/ProtectedRoute';
-import TicketCenter from "../pages/ticket_center";
+import TicketCenter from "../pages/message_center";
 
 const Router = createBrowserRouter([
   {
@@ -22,7 +22,7 @@ const Router = createBrowserRouter([
     )
   },
   {
-    path: "/ticket_center",
+    path: "/message_center",
     element: (
       <Layout>
         <ProtectedRoute allowedRoles={['agent','manager']}>
