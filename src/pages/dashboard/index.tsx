@@ -60,7 +60,7 @@ const Dashboard: React.FC = () => {
                 <div className=" border-[1px] border-black"></div>
                 <div className=" p-2">
                   <div>
-                    <h4>負責帳號</h4>
+                    <h4 onClick={handle}>負責帳號</h4>
                     <div className="grid grid-cols-4 gap-1 text-[12px]">
                       <div>123</div>
                       <div>123</div>

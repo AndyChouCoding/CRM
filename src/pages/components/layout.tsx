@@ -37,7 +37,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     }, 1000);
     return () => clearInterval(interval);
   }, [user]);
-
+  
+  const handleLogo = () => {
+    navigate("/dashboard")
+  }
   const handleLogout = () => {
     logout();
     navigate("/");
@@ -47,7 +50,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     <div>
       <div className="bg-red-50 py-4">
         <div className="mx-auto w-[1200px] flex justify-between items-center">
-          <div>CRM</div>
+          <div onClick={handleLogo}>CRM</div>
           {user && (
             <div className="flex items-center space-x-4">
               <span>已登入時長: {elapsedTime}</span>

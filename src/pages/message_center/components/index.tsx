@@ -1,13 +1,15 @@
 
-import React, { useState, useEffect, KeyboardEvent } from 'react';
+import React, { useState, useEffect, useRef, KeyboardEvent } from 'react';
 
 type Status = '處理中' | '已完成' | '未處理';
 type From = 'agent' | 'user';
+type Platform = 'line' | 'fb';
 
 interface Message {
   content: string;
   timestamp: string;
   from: From;
+  platform: Platform;
 }
 
 interface ChatProps {
@@ -16,25 +18,55 @@ interface ChatProps {
 
 const Chat: React.FC<ChatProps> = ({ ticketId }) => {
   const [status, setStatus] = useState<Status>('處理中');
-  // 預設由客戶(user)提問開始
-  const [messages, setMessages] = useState<Message[]>([{
-    content: '您好，請問能幫我解決問題嗎？',
-    timestamp: new Date().toISOString(),
-    from: 'user',
-  }]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const statuses: Status[] = ['處理中', '已完成', '未處理'];
+  // 使用 ref 儲存各 ticket 的訊息快取，避免重複請求與閃爍
+  const cacheRef = useRef<Record<string, Message[]>>({});
 
-  // 載入初始狀態
+  // 載入或恢復訊息 & 狀態
   useEffect(() => {
-    fetch(`/api/tickets/${ticketId}`)
-      .then(res => res.ok ? res.json() : Promise.reject('Status load failed'))
-      .then(data => setStatus(data.status as Status))
-      .catch(e => console.error('Load status error', e));
+    if (!ticketId) return;
+    // 先恢復快取中的訊息
+    const cached = cacheRef.current[ticketId];
+    if (cached) {
+      setMessages(cached);
+    } else {
+      // 載入狀態
+      fetch(`/api/tickets/${ticketId}`)
+        .then(res => res.ok ? res.json() : Promise.reject('Status load failed'))
+        .then(data => setStatus(data.status as Status))
+        .catch(e => console.error('Load status error', e));
+      // 載入訊息歷史
+      fetch(`/api/tickets/${ticketId}/messages`)
+        .then(res => res.ok ? res.json() : Promise.reject('Messages load failed'))
+        .then(data => {
+          let loaded: Message[] = Array.isArray(data.messages)
+            ? data.messages.map((m: any) => ({
+                content: m.content,
+                timestamp: m.timestamp,
+                from: m.platform === 'line' ? 'user' : 'agent',
+                platform: m.platform as Platform,
+              }))
+            : [];
+          if (loaded.length === 0) {
+            loaded = [{
+              content: '您好，請問需要什麼協助？',
+              timestamp: new Date().toISOString(),
+              from: 'user',
+              platform: 'line',
+            }];
+          }
+          setMessages(loaded);
+          cacheRef.current[ticketId] = loaded;
+        })
+        .catch(e => console.error('Load messages error', e));
+    }
   }, [ticketId]);
 
   // 狀態變更時自動儲存
   useEffect(() => {
+    if (!ticketId) return;
     fetch(`/api/tickets/${ticketId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -42,26 +74,24 @@ const Chat: React.FC<ChatProps> = ({ ticketId }) => {
     }).catch(e => console.error('Save status error', e));
   }, [status, ticketId]);
 
-  // 送出客服(agent)回覆
+  // 發送客服(agent)回覆
   const sendMessage = () => {
     const trimmed = input.trim();
-    if (!trimmed) return;
+    if (!trimmed || !ticketId) return;
     const newMsg: Message = {
       content: trimmed,
       timestamp: new Date().toISOString(),
       from: 'agent',
+      platform: 'fb',
     };
-    setMessages(prev => [...prev, newMsg]);
+    const updated = [...messages, newMsg];
+    setMessages(updated);
+    cacheRef.current[ticketId] = updated;
     setInput('');
-    // 同步到後端
     fetch(`/api/tickets/${ticketId}/messages`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        content: newMsg.content,
-        platform: 'line',
-        timestamp: newMsg.timestamp,
-      }),
+      body: JSON.stringify({ content: newMsg.content, platform: newMsg.platform, timestamp: newMsg.timestamp }),
     }).catch(e => console.error('Send message error', e));
   };
 
@@ -94,20 +124,19 @@ const Chat: React.FC<ChatProps> = ({ ticketId }) => {
       </div>
 
       {/* 訊息區 */}
-      <div className="flex-1 p-2 overflow-y-auto h-[1000px]" style={{ maxHeight: '500px', display: 'flex', flexDirection: 'column' }}>
+      <div className="h-[500px] p-2 overflow-y-auto flex flex-col">
+        {/* {要做為可點選agent然後觀看agent回覆情況} */}
         {messages.map((msg, idx) => (
           <div
             key={idx}
-            className={`my-1 p-2 rounded max-w-[70%] break-words ${
-              msg.from === 'user'
-                ? 'bg-gray-100 self-start text-right rounded-2xl'
-                : 'bg-blue-100 self-end text-right rounded-2xl'
-            } flex flex-col`}
+            className={`my-1 p-2 rounded max-w-[70%] break-words flex flex-col ${
+              msg.from === 'user' ? 'self-start text-left' : 'self-end text-right'
+            } ${
+              msg.platform === 'line' ? 'bg-green-100' : 'bg-blue-100'
+            } rounded-2xl`}
           >
             <span>{msg.content}</span>
-            
-            <div></div>
-            <div><span className="text-xs text-gray-500 mt-1">{formatTime(msg.timestamp)}</span></div>
+            <span className="text-xs text-gray-500 mt-1">{formatTime(msg.timestamp)}</span>
           </div>
         ))}
       </div>
@@ -135,4 +164,3 @@ const Chat: React.FC<ChatProps> = ({ ticketId }) => {
 };
 
 export default Chat;
-
