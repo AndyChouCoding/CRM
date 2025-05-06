@@ -1,24 +1,52 @@
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
+
+interface Customer {
+  id: string;
+  name: string;
+}
+
 
 const Dashboard: React.FC = () => {
   const { user } = useAuth();
   const navigation = useNavigate();
-  const handle =() =>{
-    navigation('/message_center')
-  }
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  useEffect(() => {
+    if (user?.role === "agent") {
+      fetch(`/api/customers?agentId=${user.id}`)
+        .then(res => {
+          if (!res.ok) throw new Error("Customers load failed");
+          return res.json();
+        })
+        .then((data: { customers: Customer[] }) => {
+          setCustomers(data.customers);
+        })
+        .catch(err => console.error(err));
+    }
+  }, [user]);
+
+  const handle = () => {
+    navigation("/message_center");
+  };
 
   return (
     <>
-      <div className="p-10">
+      <div className="p-10 ">
         <div className="flex justify-between my-10">
           {/* User資料 */}
           {user?.role === "manager" ? (
             <div>
               {/* manager */}
-              <div className="p-2 w-[300px] h-[200px] border-[1px] border-black rounded-xl">
+              <div className="p-2 w-[300px] h-[200px] border-[1px] border-black bg-white rounded-xl">
                 <div className="flex justify-between items-center p-1">
-                  <div className=" bg-slate-500 w-[60px] h-[60px] rounded-full"></div>
+                  <div>
+                    <img
+                      className="w-[60px] h-[60px] rounded-full"
+                      src={user?.photo}
+                      alt=""
+                    />
+                  </div>
                   <div className="text-center">
                     <div>{user?.name}</div>
                     <div className=" bg-purple-500 text-white p-2 rounded-xl">
@@ -26,7 +54,7 @@ const Dashboard: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                <div className=" border-[1px] border-black"></div>
+                <div className=" border-[1px] border-black "></div>
                 <div className=" p-2">
                   <div onClick={handle}>
                     <a href="">負責帳號</a>
@@ -47,9 +75,15 @@ const Dashboard: React.FC = () => {
             <div>
               {" "}
               {/* agent */}
-              <div className="p-2 w-[300px] h-[200px] border-[1px] border-black rounded-xl">
+              <div className="p-2 w-[300px] h-[200px] border-[1px] border-black bg-white rounded-xl">
                 <div className="flex justify-between items-center p-1">
-                  <div className=" bg-slate-500 w-[60px] h-[60px] rounded-full"></div>
+                  <div>
+                    <img
+                      className="w-[60px] h-[60px] rounded-full"
+                      src={user?.photo}
+                      alt=""
+                    />
+                  </div>
                   <div className="text-center">
                     <div>{user?.name}</div>
                     <div className=" bg-purple-500 text-white p-2 rounded-xl">
@@ -60,12 +94,25 @@ const Dashboard: React.FC = () => {
                 <div className=" border-[1px] border-black"></div>
                 <div className=" p-2">
                   <div>
-                    <h4 onClick={handle}>負責帳號</h4>
-                    <div className="grid grid-cols-4 gap-1 text-[12px]">
-                      <div>123</div>
-                      <div>123</div>
-                      <div>123</div>
-                      <div>123</div>
+                    <h4>負責帳號</h4>
+                    <div className="grid grid-cols-4 gap-1 text-[10px] ">
+                      {customers.length > 0 ? (
+                        customers.map(c => (
+                          <div
+                            key={c.id}
+                            className="cursor-pointer hover:bg-gray-100 p-1 rounded-md bg-slate-300 text-center"
+                            onClick={() =>
+                              navigation("/message_center", {
+                                state: { agentId: user?.id, customerId: c.id },
+                              })
+                            }
+                          >
+                            {c.name}
+                          </div>
+                        ))
+                      ) : (
+                        <div className="col-span-4 text-gray-400">— 無客戶 —</div>
+                      )}
                     </div>
                   </div>
                   <div>
@@ -81,7 +128,7 @@ const Dashboard: React.FC = () => {
             </div>
           )}
           {/* 代辦事項 */}
-          <div className="p-4 w-[400px] h-[200px] border-[1px] border-black rounded-xl">
+          <div className="p-4 w-[400px] h-[200px] border-[1px] border-black bg-white rounded-xl">
             <div className="text-center p-2">
               <h3>代辦事項</h3>
             </div>
@@ -94,7 +141,7 @@ const Dashboard: React.FC = () => {
             </div>
           </div>
           {/* 今日個人服務人數 */}
-          <div className="p-4 w-[200px] h-[200px] text-center border-[1px] border-black rounded-xl">
+          <div className="p-4 w-[200px] h-[200px] text-center border-[1px] border-black bg-white rounded-xl">
             <div className="p-2">
               <h3>今日個人服務人數</h3>
             </div>
@@ -105,14 +152,14 @@ const Dashboard: React.FC = () => {
         </div>
         <div className="flex justify-between my-10">
           {/* 本週客服趨勢 */}
-          <div className="p-4 w-[350px] h-[200px] text-center border-[1px] border-black rounded-xl">
+          <div className="p-4 w-[350px] h-[200px] text-center border-[1px] border-black bg-white rounded-xl">
             <div className="p-2">
               <h3>本週客服趨勢</h3>
             </div>
             <div>img</div>
           </div>
           {/* 等待服務人數 */}
-          <div className="p-4 w-[200px] h-[200px] text-center border-[1px] border-black rounded-xl">
+          <div className="p-4 w-[200px] h-[200px] text-center border-[1px] border-black bg-white rounded-xl">
             <div className="p-2">
               <h3>等待服務人數</h3>
             </div>
@@ -121,7 +168,7 @@ const Dashboard: React.FC = () => {
             </div>
           </div>
           {/* 處理中人數 */}
-          <div className="p-4 w-[200px] h-[200px] text-center border-[1px] border-black rounded-xl">
+          <div className="p-4 w-[200px] h-[200px] text-center border-[1px] border-black bg-white rounded-xl">
             <div className="p-2">
               <h3>處理中人數</h3>
             </div>
@@ -130,7 +177,7 @@ const Dashboard: React.FC = () => {
             </div>
           </div>
           {/* 今日團隊服務人數 */}
-          <div className="p-4 w-[200px] h-[200px] text-center border-[1px] border-black rounded-xl">
+          <div className="p-4 w-[200px] h-[200px] text-center border-[1px] border-black bg-white rounded-xl">
             <div className="p-2">
               <h3>今日團隊服務人數</h3>
             </div>
@@ -143,7 +190,7 @@ const Dashboard: React.FC = () => {
         {user?.role === "manager" && (
           <div className="flex justify-between my-10">
             {/* 配對失敗人數 */}
-            <div className="p-4 w-[200px] h-[200px] text-center border-[1px] border-black rounded-xl">
+            <div className="p-4 w-[200px] h-[200px] text-center border-[1px] border-black bg-white rounded-xl">
               <div className="p-2">
                 <h3>配對失敗人數</h3>
               </div>
@@ -152,15 +199,15 @@ const Dashboard: React.FC = () => {
               </div>
             </div>
             {/* 客戶標籤 */}
-            <div className="p-4 w-[200px] h-[200px] text-center border-[1px] border-black rounded-xl place-content-center">
+            <div className="p-4 w-[200px] h-[200px] text-center border-[1px] border-black bg-white rounded-xl place-content-center">
               <a>客戶標籤</a>
             </div>
             {/* 重新分配客服 */}
-            <div className="p-4 w-[200px] h-[200px] text-center border-[1px] border-black rounded-xl place-content-center">
+            <div className="p-4 w-[200px] h-[200px] text-center border-[1px] border-black bg-white rounded-xl place-content-center">
               <a>重新分配客服</a>
             </div>
             {/* 客服人員帳號管理 */}
-            <div className="p-4 w-[300px] h-[200px] text-center border-[1px] border-black rounded-xl place-content-center">
+            <div className="p-4 w-[300px] h-[200px] text-center border-[1px] border-black bg-white rounded-xl place-content-center">
               <a href="" className="">
                 客服人員帳號管理
               </a>

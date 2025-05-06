@@ -8,11 +8,13 @@ interface UserAttrs {
   username: string;
   password: string;
   role: "agent" | "manager";
+  photo: string;
 }
 interface CustomerAttrs {
   id: string;
   name: string;
   agentId: string; // 負責客服
+  photo: string;
 }
 interface TicketAttrs {
   id: string;
@@ -51,6 +53,7 @@ export function makeServer() {
             username: "manager",
             password: "123456",
             role: "manager",
+            photo: "/images/user/manager.jpeg"
           },
           {
             id: "manager1",
@@ -58,6 +61,7 @@ export function makeServer() {
             username: "mgr_alice",
             password: "123456",
             role: "manager",
+            photo: "/images/user/manager.jpeg"
           },
           {
             id: "manager2",
@@ -65,6 +69,7 @@ export function makeServer() {
             username: "mgr_bobby",
             password: "123456",
             role: "manager",
+            photo: "/images/user/manager.jpeg"
           },
           {
             id: "agent0",
@@ -72,6 +77,7 @@ export function makeServer() {
             username: "agent",
             password: "123456",
             role: "agent",
+            photo: "/images/user/agent.jpeg"
           },
           {
             id: "agent1",
@@ -79,6 +85,7 @@ export function makeServer() {
             username: "agt_bob",
             password: "123456",
             role: "agent",
+            photo: "/images/user/agent.jpeg"
           },
           {
             id: "agent2",
@@ -86,19 +93,20 @@ export function makeServer() {
             username: "agt_bella",
             password: "123456",
             role: "agent",
+            photo: "/images/user/agent.jpeg"
           },
         ],
         tickets: server.schema.db.tickets, // keep factories for tickets
       });
       server.db.customers.insert([
-        { id: "cust1", name: "John Doe", agentId: "agent0" },
-        { id: "cust2", name: "Jane Smith", agentId: "agent0" },
-        { id: "cust3", name: "Tom Cat", agentId: "agent1" },
-        { id: "cust4", name: "Johnson", agentId: "agent1" },
-        { id: "cust5", name: "John Cena", agentId: "agent1" },
-        { id: "cust6", name: "Bella Wang", agentId: "agent2" },
-        { id: "cust7", name: "Ella Chen", agentId: "agent2" },
-        { id: "cust8", name: "The Rock", agentId: "agent2" },
+        { id: "cust1", name: "John Doe", agentId: "agent0",photo:"/images/customer/c1.jpeg" },
+        { id: "cust2", name: "Jane Smith", agentId: "agent0",photo:"/images/customer/c2.jpeg" },
+        { id: "cust3", name: "Tom Cat", agentId: "agent1",photo:"/images/customer/c3.jpeg" },
+        { id: "cust4", name: "Johnson", agentId: "agent1",photo:"/images/customer/c4.jpeg" },
+        { id: "cust5", name: "John Cena", agentId: "agent1",photo:"/images/customer/c5.jpeg" },
+        { id: "cust6", name: "Bella Wang", agentId: "agent2",photo:"/images/customer/c6.jpeg" },
+        { id: "cust7", name: "Ella Chen", agentId: "agent2",photo:"/images/customer/c7.jpeg" },
+        { id: "cust8", name: "The Rock", agentId: "agent2",photo:"/images/customer/c8.jpeg" },
       ]);
       // 建立 Tickets：每個 customer 一張 ticket
       const now = new Date().toISOString();
@@ -161,6 +169,7 @@ export function makeServer() {
             name: user.name,
             username: user.username,
             role: user.role,
+            photo: user.photo,
           },
         };
       });
@@ -172,7 +181,7 @@ export function makeServer() {
         }
         const current = schema.db.users.findBy({ username: "mgr_alice" });
         return {
-          user: { id: current.id, name: current.name, role: current.role },
+          user: { id: current.id, name: current.name, role: current.role, photo: current.photo },
         };
       });
 

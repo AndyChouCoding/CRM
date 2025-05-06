@@ -19,36 +19,37 @@ const Login = () => {
 
   return (
     <>
-      <div className="">
+      <div className="bg-[#faf7f5] pt-20">
         <form
           onSubmit={handleSubmit}
-          className="max-w-sm mx-auto mt-20 p-6 bg-white rounded-md shadow-md"
+          className="max-w-sm mx-auto p-6 bg-white rounded-md shadow-md"
         >
-          <h2 className="text-2xl mb-4">登入 CRM 系統</h2>
-          <div>
-            <p>可使用Manager,Agent模式登入</p>
-            <p>username:manager,agent;password:123456</p>
-          </div>
+          <h2 className="text-2xl mb-4 p-4">登入 CRM 系統</h2>
           <input
             type="text"
-            className="w-full mb-3 p-2 border"
-            placeholder="Username"
+            className="w-full mb-3 p-2 border rounded-xl"
+            placeholder="使用者代號"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
           />
           <input
             type="password"
-            className="w-full mb-3 p-2 border"
-            placeholder="Password"
+            className="w-full mb-3 p-2 border rounded-xl"
+            placeholder="使用者密碼"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
           <button
             type="submit"
-            className="w-full p-2 bg-blue-600 text-white rounded"
+            className="w-full my-2 p-2 bg-orange-400 text-white rounded-md "
           >
             登入
           </button>
+          <div className="mt-4">
+            <p>因為使用者不同而有不同的介面</p>
+            <p>可分別使用Manager或Agent模式登入</p>
+            <p>username:manager,agent;password:123456</p>
+          </div>
         </form>
       </div>
     </>

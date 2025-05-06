@@ -1,6 +1,6 @@
 import { ReactNode, useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../contexts/AuthContext";  // 確保路徑正確
+import { useAuth } from "../../contexts/AuthContext"; // 確保路徑正確
 
 interface LayoutProps {
   children: ReactNode;
@@ -37,10 +37,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     }, 1000);
     return () => clearInterval(interval);
   }, [user]);
-  
+
   const handleLogo = () => {
-    navigate("/dashboard")
-  }
+    navigate("/dashboard");
+  };
   const handleLogout = () => {
     logout();
     navigate("/");
@@ -48,9 +48,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   return (
     <div>
-      <div className="bg-red-50 py-4">
+      <nav className="bg-[#f7be43] py-4 text-center">
         <div className="mx-auto w-[1200px] flex justify-between items-center">
-          <div onClick={handleLogo}>CRM</div>
+          <h1 className="text-[#614ebf] text-[28px] font-bold" onClick={handleLogo}>CRM</h1>
           {user && (
             <div className="flex items-center space-x-4">
               <span>已登入時長: {elapsedTime}</span>
@@ -60,8 +60,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             </div>
           )}
         </div>
+      </nav>
+      <div className="bg-[#faf7f5] h-[100vh]">
+        <main className="mx-auto w-[1200px] ">{children}</main>
       </div>
-      <div className="mx-auto w-[1200px] ">{children}</div>
     </div>
   );
 };

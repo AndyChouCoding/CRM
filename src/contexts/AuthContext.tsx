@@ -4,6 +4,7 @@ export interface User {
   id: string;
   name: string;
   role: "agent" | "manager";
+  photo?: string;
 }
 
 interface AuthContextProps {
@@ -25,6 +26,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const [token, setToken] = useState<string | null>(() =>
     localStorage.getItem("token")
   );
+
+  
 
   const login = async (username: string, password: string) => {
     const res = await fetch("/api/auth/login", {

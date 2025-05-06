@@ -51,7 +51,7 @@ const Chat: React.FC<ChatProps> = ({ ticketId }) => {
             : [];
           if (loaded.length === 0) {
             loaded = [{
-              content: '您好，請問需要什麼協助？',
+              content: '您好，請問可以協助我嗎？',
               timestamp: new Date().toISOString(),
               from: 'user',
               platform: 'line',
@@ -108,7 +108,7 @@ const Chat: React.FC<ChatProps> = ({ ticketId }) => {
   };
 
   return (
-    <div className="border border-black w-[820px] rounded-xl flex flex-col">
+    <div className="border border-black w-[820px] rounded-xl flex flex-col bg-white">
       {/* 狀態下拉選單 */}
       <div className="h-[60px] border-b border-black flex items-center px-4 place-content-center">
         <select
@@ -124,7 +124,7 @@ const Chat: React.FC<ChatProps> = ({ ticketId }) => {
       </div>
 
       {/* 訊息區 */}
-      <div className="h-[500px] p-2 overflow-y-auto flex flex-col">
+      <div className="h-[500px] bg-white p-2 overflow-y-auto flex flex-col">
         {/* {要做為可點選agent然後觀看agent回覆情況} */}
         {messages.map((msg, idx) => (
           <div
@@ -142,7 +142,7 @@ const Chat: React.FC<ChatProps> = ({ ticketId }) => {
       </div>
 
       {/* 輸入區 */}
-      <div className="p-2 border-t border-black">
+      <div className="p-2 border-t border-black bg-white">
         <textarea
           value={input}
           onChange={e => setInput(e.target.value)}

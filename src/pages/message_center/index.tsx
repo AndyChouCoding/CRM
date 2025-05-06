@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import Chat from "./components/"; // 保留原先引用
+import Chat from "./components/";
 
 interface Agent {
   id: string;
@@ -10,6 +10,7 @@ interface Agent {
 interface Customer {
   id: string;
   name: string;
+  photo: string;
 }
 interface Ticket {
   id: string;
@@ -47,19 +48,25 @@ const MessageCenter: React.FC = () => {
   }, [user]);
 
   // 載入該 agent 的客戶列表
-  useEffect(() => {
-    if (!selectedAgent) return;
-    fetch(`/api/customers?agentId=${selectedAgent.id}`)
-      .then((res) =>
-        res.ok ? res.json() : Promise.reject("Customers load failed")
-      )
-      .then((data) => {
-        setCustomers(data.customers);
-        if (data.customers.length) setSelectedCustomer(data.customers[0]);
-        else setSelectedCustomer(null);
-      })
-      .catch((e) => console.error("Load customers error", e));
-  }, [selectedAgent]);
+useEffect(() => {
+  if (!selectedAgent) return;
+  fetch(`/api/customers?agentId=${selectedAgent.id}`)
+    .then(res =>
+      res.ok ? res.json() : Promise.reject("Customers load failed")
+    )
+    .then((data: { customers: Customer[] }) => {
+      // 加上預設頭像
+      const list = data.customers.map(c => ({
+        ...c,
+        photo: c.photo ?? "/images/customer/default-avatar.png"
+      }));
+      setCustomers(list);
+      if (list.length) setSelectedCustomer(list[0]);
+      else setSelectedCustomer(null);
+    })
+    .catch(e => console.error("Load customers error", e));
+}, [selectedAgent]);
+
 
   // 根據選中客戶取出 ticket
   useEffect(() => {
@@ -80,14 +87,16 @@ const MessageCenter: React.FC = () => {
   const handleNavigate = () => {
     navigate("/message_center");
   };
-
+  console.log(user?.photo,'photo')
   return (
     <div className="flex p-10 justify-between">
       {/* 左側面板 */}
       <div className="w-[300px]">
-        <div className="p-2 w-full h-[200px] border border-black rounded-xl">
+        <div className="p-2 w-full h-[200px] border border-black bg-white rounded-xl">
           <div className="flex justify-between items-center p-1">
-            <div className="bg-slate-500 w-[60px] h-[60px] rounded-full" />
+            <div className="" >
+                <img className=" w-[60px] h-[60px] rounded-full" src={user?.photo} alt="" />
+            </div>
             <div className="text-center">
               <div>{user?.name}</div>
               <div className="bg-purple-500 text-white p-2 rounded-xl">
@@ -111,17 +120,27 @@ const MessageCenter: React.FC = () => {
               <li
                 key={c.id}
                 className={`mb-2 cursor-pointer ${
-                  selectedCustomer?.id === c.id ? "bg-gray-200" : ""
+                  selectedCustomer?.id === c.id
+                    ? "bg-gray-200 rounded-2xl"
+                    : "bg-white "
                 }`}
                 onClick={() => setSelectedCustomer(c)} // MODIFIED: 點選客戶改變聊天室
               >
                 <div className="flex items-center border-2 border-gray-400 p-4 rounded-2xl">
-                  <div className="bg-slate-500 w-[50px] h-[50px] rounded-full mr-4" />
+                  <div>
+                    <img className="bg-slate-500 w-[50px] h-[50px] rounded-full mr-4" src={c.photo} alt="" />
+                  </div>
                   <div>
                     <div className="">{c.name}</div>
                     <div className="text-gray-500 text-[12px]">您有新訊息</div>
                     <div className="flex ">
-                      <div className="px-6  bg-slate-300 ">facebook</div>
+                      <div className=" p-1 bg-slate-300 flex rounded-md text-center items-center">
+                        <img
+                          className="w-[20px] h-[20px]  "
+                          src="/images/messageIcon/facebook_icon.png"
+                        ></img>
+                        <p className="mx-2 px-2 py-1 text-[10px] bg-white rounded-lg">facebook</p>
+                      </div>
                       <div className="p-1 ml-8 bg-slate-300 h-[30px] w-[30px] rounded-full"></div>
                     </div>
                   </div>
@@ -156,7 +175,7 @@ const MessageCenter: React.FC = () => {
         {selectedTicketId ? (
           <Chat ticketId={selectedTicketId} /> // MODIFIED: 直接傳入動態 ticketId
         ) : (
-          <Chat ticketId={""}/>
+          <Chat ticketId={""} />
         )}
       </div>
     </div>
